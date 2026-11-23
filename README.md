@@ -1,4 +1,4 @@
-# Minis Coach: Colchester RC
+# Minis Coach
 
 A web app (desktop and phone) for running the minis section. It covers:
 

@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CRC Minis Coach",
+    name: "Minis Coach",
     short_name: "Minis Coach",
-    description: "Training plans, drills, registers and awards for Colchester Rugby Club minis.",
+    description: "Training plans, drills, registers and awards for minis rugby.",
     start_url: "/",
     display: "standalone",
     background_color: "#f6f7f4",

@@ -58,7 +58,7 @@ export function Nav({ user }: { user: { name: string; role: Role } }) {
           <Logo />
           <div className="leading-tight">
             <div className="font-display text-lg font-bold">Minis Coach</div>
-            <div className="text-xs text-muted">Colchester RC</div>
+            <div className="text-xs text-muted">Minis rugby</div>
           </div>
         </Link>
         <nav className="flex-1 space-y-0.5 px-3">

@@ -23,8 +23,8 @@ export default async function EnrolPage({ params }: { params: Promise<{ token: s
         <div className="mb-6 flex items-center gap-3">
           <Logo size={44} />
           <div>
-            <div className="font-display text-lg font-bold">Colchester RC Minis</div>
-            <div className="text-sm text-muted">Minis Coach</div>
+            <div className="font-display text-lg font-bold">Minis Coach</div>
+            <div className="text-sm text-muted">Minis rugby</div>
           </div>
         </div>
         {valid ? (

@@ -51,12 +51,12 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
   const date = new Date(row.a.awardedOn + "T12:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   const buf = await renderToBuffer(
-    <Document title={`${row.a.title}: ${row.p.firstName} ${row.p.lastName}`} author="Colchester Rugby Club Minis">
+    <Document title={`${row.a.title}: ${row.p.firstName} ${row.p.lastName}`} author="Minis Coach">
       <Page size="A4" orientation="landscape" style={s.page}>
         <View style={s.frame}>
           <View style={s.inner}>
             <Ball />
-            <Text style={s.club}>COLCHESTER RUGBY CLUB · MINIS{row.group ? ` · ${row.group.toUpperCase()}` : ""}</Text>
+            <Text style={s.club}>MINIS RUGBY{row.group ? ` · ${row.group.toUpperCase()}` : ""}</Text>
             <Text style={s.kind}>{KIND[row.a.type]}</Text>
             <Text style={s.title}>{row.a.title}</Text>
             <Text style={s.presented}>proudly presented to</Text>

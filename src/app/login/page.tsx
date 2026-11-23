@@ -25,12 +25,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <Logo size={44} />
             <div>
               <div className="font-display text-xl font-bold">Minis Coach</div>
-              <div className="text-sm text-muted">Colchester Rugby Club</div>
+              <div className="text-sm text-muted">Minis rugby</div>
             </div>
           </div>
           {deleted && (
             <p className="mb-6 rounded-xl bg-brand-soft px-4 py-3 text-sm" role="status">
-              Your account has been deleted. Thanks for being part of Colchester RC Minis.
+              Your account has been deleted. Thanks for being part of minis rugby.
             </p>
           )}
           <h1 className="mb-1 text-2xl font-bold">Sign in</h1>

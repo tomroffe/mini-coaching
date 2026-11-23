@@ -6,8 +6,8 @@ const body = Inter({ subsets: ["latin"], variable: "--font-body" });
 const display = Outfit({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700", "800"] });
 
 export const metadata: Metadata = {
-  title: { default: "CRC Minis Coach", template: "%s · CRC Minis Coach" },
-  description: "Training plans, drills, registers and awards for Colchester Rugby Club minis.",
+  title: { default: "Minis Coach", template: "%s · Minis Coach" },
+  description: "Training plans, drills, registers and awards for minis rugby.",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Minis Coach", statusBarStyle: "default" },
 };
