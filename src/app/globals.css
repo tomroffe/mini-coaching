@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Club palette: change --brand / --accent to re-skin the whole app. */
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --surface-2: #f0f2ee;
+  --border: #e2e5df;
+  --text: #15201b;
+  --muted: #5f6b65;
+  --brand: #0f5132;
+  --brand-fg: #ffffff;
+  --brand-soft: #e3f1e9;
+  --accent: #f5b301;
+  --danger: #c2410c;
+  --pitch: #3f9b5a;
+  --pitch-dark: #378a4f;
+  --pitch-line: rgba(255, 255, 255, 0.75);
+  /* Categorical data-viz slots (validated: adjacent CVD ΔE ≥ 9.1 light / 8.4 dark) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1411;
+    --surface: #141d19;
+    --surface-2: #1b2621;
+    --border: #26342d;
+    --text: #e8efe9;
+    --muted: #93a39a;
+    --brand: #3fb87a;
+    --brand-fg: #04130b;
+    --brand-soft: #173326;
+    --accent: #f7c843;
+    --danger: #fb923c;
+    --pitch: #2b6e40;
+    --pitch-dark: #265f38;
+    --pitch-line: rgba(255, 255, 255, 0.6);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1411;
+  --surface: #141d19;
+  --surface-2: #1b2621;
+  --border: #26342d;
+  --text: #e8efe9;
+  --muted: #93a39a;
+  --brand: #3fb87a;
+  --brand-fg: #04130b;
+  --brand-soft: #173326;
+  --accent: #f7c843;
+  --danger: #fb923c;
+  --pitch: #2b6e40;
+  --pitch-dark: #265f38;
+  --pitch-line: rgba(255, 255, 255, 0.6);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Simple markdown-ish prose */
+.prose-lite p { margin: 0.5em 0; }
+.prose-lite ul { list-style: disc; padding-left: 1.25rem; margin: 0.5em 0; }
+.prose-lite li { margin: 0.2em 0; }
+.prose-lite a { color: var(--brand); text-decoration: underline; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  .print-break { break-before: page; }
+}

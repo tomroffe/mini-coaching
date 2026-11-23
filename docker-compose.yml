@@ -1,0 +1,58 @@
+# Production-style stack. For local development run only the database:
+#   docker compose up -d db
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crc
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-crc}
+      POSTGRES_DB: crc
+    volumes: ["./data/postgres:/var/lib/postgresql/data"]
+    ports: ["127.0.0.1:${DB_PORT:-5433}:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crc"]
+      interval: 5s
+      retries: 10
+
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgres://crc:${POSTGRES_PASSWORD:-crc}@db:5432/crc
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
+      MEDIA_DIR: /data/media
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Club Admin}
+      SECURE_COOKIES: "true"
+      APP_URL: https://${APP_DOMAIN:-localhost}
+    volumes: ["./data/media:/data/media"]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-localhost}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    depends_on: [db]
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:-crc}
+    volumes: ["./backups:/backups", "./docker/backup.sh:/backup.sh:ro", "./data/media:/media:ro"]
+    entrypoint: ["sh", "/backup.sh"]
+
+# Postgres data and uploaded media live in ./data on the host (bind mounts),
+# so they are easy to inspect, copy and back up.
+volumes:
+  caddydata:
