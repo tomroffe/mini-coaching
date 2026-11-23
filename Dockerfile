@@ -13,6 +13,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm build
 
 FROM base AS run
+# Links the GHCR package to the GitHub repo
+LABEL org.opencontainers.image.source="https://github.com/tomroffe/mini-coaching"
+LABEL org.opencontainers.image.description="Minis Coach: training plans, drills, registers and awards for minis rugby"
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 WORKDIR /app
 # Full node_modules so migrate/seed (tsx) can run at start-up

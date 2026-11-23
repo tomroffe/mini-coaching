@@ -17,6 +17,9 @@ services:
 
 
   app:
+    # On the Pi: `docker compose pull app && docker compose up -d` uses the published image.
+    # Locally: `docker compose up -d --build` builds from source instead.
+    image: ${APP_IMAGE:-ghcr.io/tomroffe/mini-coaching:latest}
     build: .
     restart: unless-stopped
     depends_on:

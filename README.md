@@ -64,7 +64,28 @@ docker compose up -d --build
 ### Testing the QR on a real phone (development)
 `localhost` isn't reachable from a phone. Open the app on your computer at its network address instead (e.g. `http://192.168.x.x:3000`, which `pnpm dev` prints as "Network"), or set `APP_URL` in `.env`. The QR code then points at that address. In production, `APP_URL` is set from `APP_DOMAIN` in `docker-compose.yml`.
 
-## Tests
+## Publishing the image (GitHub Container Registry)
+
+Build once on your computer for both amd64 and arm64 (Raspberry Pi), push it to `ghcr.io`, and let servers pull it instead of building:
+
+```bash
+# one-time: a GitHub token (classic) with the write:packages scope
+echo "$GHCR_TOKEN" | docker login ghcr.io -u <github-username> --password-stdin
+
+pnpm image:push            # → ghcr.io/tomroffe/mini-coaching:<git-sha> and :latest
+pnpm image:push v1.0.0     # → :v1.0.0 and :latest
+PLATFORMS=linux/arm64 pnpm image:push   # Pi only, quicker
+```
+
+On the server (e.g. the Pi):
+
+```bash
+docker compose pull app && docker compose up -d
+```
+
+If the package is **private** (the default for a new GHCR package), the server needs a `docker login ghcr.io` too, with a token that has only `read:packages`. Or make the package public under GitHub → your profile → Packages → mini-coaching → Package settings. The image holds no secrets: those all come from `.env` at run time. To run a specific version, set `APP_IMAGE=ghcr.io/tomroffe/mini-coaching:v1.0.0` in `.env`.
+
+
 
 ```bash
 pnpm test        # unit tests: permissions, cancel-and-shift, seeded diagram + season data
