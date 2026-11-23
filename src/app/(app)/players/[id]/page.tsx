@@ -7,6 +7,8 @@ import { db, schema } from "@/db";
 import { canManagePlayer, canViewPlayer, requireAccess } from "@/lib/authz";
 import { photoUrl } from "@/lib/queries";
 import { cn, fmtDate, todayISO } from "@/lib/utils";
+import { AwardTypeTag } from "@/components/award-type-tag";
+import { awardType } from "@/lib/awards";
 import { GuardianForm, PhotoForm, PlayerDetailsForm } from "./forms";
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -62,9 +64,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 <ul className="space-y-2">
                   {awards.map((a) => (
                     <li key={a.id} className="flex items-center gap-3 rounded-xl bg-surface-2 p-3">
-                      <span className="text-2xl">{a.type === "player_of_week" ? "⭐" : a.type === "badge" ? "🏅" : a.type === "milestone" ? "🎯" : "📜"}</span>
+                      <span className="text-2xl">{awardType(a.type).emoji}</span>
                       <div className="min-w-0 flex-1">
-                        <div className="font-medium">{a.title}</div>
+                        <div className="flex flex-wrap items-center gap-1.5 font-medium">{a.title} <AwardTypeTag type={a.type} /></div>
                         <div className="truncate text-xs text-muted">{fmtDate(a.awardedOn, { day: "numeric", month: "short", year: "numeric" })}{a.reason && ` · ${a.reason}`}</div>
                       </div>
                       <a href={`/api/certificate/${a.id}`} className="rounded-lg p-2 text-muted hover:bg-surface hover:text-brand" title="Download certificate"><Download className="size-4" /></a>

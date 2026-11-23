@@ -8,14 +8,7 @@ import { createPortal } from "react-dom";
 import { Card } from "@/components/ui";
 import { cn, fmtDate } from "@/lib/utils";
 
-/** Fixed categorical order: colour follows the award type, never its rank. */
-export const AWARD_TYPES = [
-  { value: "player_of_week", label: "Player of the week", short: "POTW", colour: "var(--series-1)" },
-  { value: "badge", label: "Badge", short: "Badges", colour: "var(--series-2)" },
-  { value: "milestone", label: "Milestone", short: "Milestones", colour: "var(--series-3)" },
-  { value: "certificate", label: "Certificate", short: "Certificates", colour: "var(--series-4)" },
-] as const;
-type AwardType = (typeof AWARD_TYPES)[number]["value"];
+import { AWARD_TYPES, type AwardType } from "@/lib/awards";
 
 type Player = { id: string; name: string; groupId: string | null };
 type Group = { id: string; code: string; colour: string };

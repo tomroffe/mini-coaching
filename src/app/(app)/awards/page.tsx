@@ -6,12 +6,13 @@ import { db, schema } from "@/db";
 import { canManagePlayer, requireAccess } from "@/lib/authz";
 import { photoUrl, visiblePlayers } from "@/lib/queries";
 import { fmtDate } from "@/lib/utils";
+import { AwardTypeTag } from "@/components/award-type-tag";
+import { awardType } from "@/lib/awards";
 import { AwardForm, DeleteAward } from "./form";
 import { AwardInsights } from "./insights";
 
 export const metadata = { title: "Awards" };
 
-const EMOJI = { player_of_week: "⭐", certificate: "📜", badge: "🏅", milestone: "🎯" } as const;
 
 export default async function AwardsPage({ searchParams }: { searchParams: Promise<{ player?: string }> }) {
   const ctx = await requireAccess(["admin", "coach"]);
@@ -62,10 +63,10 @@ export default async function AwardsPage({ searchParams }: { searchParams: Promi
                 <li key={a.id} className="flex items-center gap-3 py-3">
                   <div className="relative">
                     <Avatar first={firstName} last={lastName} src={photoUrl({ photoKey, photoConsent })} size={44} colour={gById.get(ageGroupId ?? "")?.colour} />
-                    <span className="absolute -right-1 -bottom-1 text-base">{EMOJI[a.type]}</span>
+                    <span className="absolute -right-1 -bottom-1 text-base">{awardType(a.type).emoji}</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-medium"><Link href={`/players/${a.playerId}`} className="hover:text-brand">{firstName} {lastName}</Link> · {a.title}</div>
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 font-medium"><Link href={`/players/${a.playerId}`} className="hover:text-brand">{firstName} {lastName}</Link> · {a.title} <AwardTypeTag type={a.type} /></div>
                     <div className="truncate text-xs text-muted">{fmtDate(a.awardedOn, { day: "numeric", month: "short", year: "numeric" })}{by && ` · by ${by}`}{a.reason && ` · ${a.reason}`}</div>
                   </div>
                   <a href={`/api/certificate/${a.id}`} className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-brand hover:bg-brand-soft" title="Download certificate PDF">

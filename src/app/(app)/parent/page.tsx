@@ -5,6 +5,8 @@ import { db, schema } from "@/db";
 import { requireAccess } from "@/lib/authz";
 import { attendanceRates, photoUrl, visiblePlayers } from "@/lib/queries";
 import { fmtDate, todayISO } from "@/lib/utils";
+import { AwardTypeTag } from "@/components/award-type-tag";
+import { awardType } from "@/lib/awards";
 import { ConsentToggle } from "./consent";
 
 export const metadata = { title: "My child" };
@@ -95,8 +97,8 @@ export default async function ParentPage({ searchParams }: { searchParams: Promi
                     {kAwards.length === 0 && <p className="text-sm text-muted">None yet. Keep going!</p>}
                     {kAwards.map((a) => (
                       <a key={a.id} href={`/api/certificate/${a.id}`} className="flex items-center gap-3 rounded-xl bg-surface-2 p-2.5 hover:bg-brand-soft">
-                        <span className="text-xl">{a.type === "player_of_week" ? "⭐" : a.type === "badge" ? "🏅" : a.type === "milestone" ? "🎯" : "📜"}</span>
-                        <div className="flex-1"><div className="text-sm font-medium">{a.title}</div><div className="text-xs text-muted">{fmtDate(a.awardedOn, { day: "numeric", month: "short", year: "numeric" })}</div></div>
+                        <span className="text-xl">{awardType(a.type).emoji}</span>
+                        <div className="flex-1"><div className="flex flex-wrap items-center gap-1.5 text-sm font-medium">{a.title} <AwardTypeTag type={a.type} /></div><div className="text-xs text-muted">{fmtDate(a.awardedOn, { day: "numeric", month: "short", year: "numeric" })}</div></div>
                         <Download className="size-4 text-muted" />
                       </a>
                     ))}

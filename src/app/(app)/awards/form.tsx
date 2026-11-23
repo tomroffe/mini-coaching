@@ -2,28 +2,19 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, PartyPopper, Search, Trash2 } from "lucide-react";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { Button, Card, CardHeader, Field, Input, Textarea } from "@/components/ui";
+import { AWARD_TYPES, awardType, type AwardType } from "@/lib/awards";
 import { cn, todayISO } from "@/lib/utils";
 import { deleteAward, giveAward } from "./actions";
 
-const PRESETS = [
-  { type: "player_of_week", title: "Player of the Week", emoji: "⭐" },
-  { type: "badge", title: "Super Supporter", emoji: "🤝" },
-  { type: "badge", title: "Tag Master", emoji: "🏷️" },
-  { type: "badge", title: "Try Scorer", emoji: "🏉" },
-  { type: "badge", title: "Great Listener", emoji: "👂" },
-  { type: "milestone", title: "First Tag Game", emoji: "🎯" },
-  { type: "certificate", title: "Season Certificate", emoji: "📜" },
-] as const;
-
 export function AwardForm({ players, preselect }: { players: { id: string; name: string; group: string }[]; preselect?: string }) {
   const [state, action, pending] = useActionState(giveAward, undefined);
-  const [preset, setPreset] = useState(0);
+  const [type, setType] = useState<AwardType>("player_of_week");
+  const [title, setTitle] = useState<string>(AWARD_TYPES[0].presets[0]);
   const [selected, setSelected] = useState<string[]>(preselect ? [preselect] : []);
   const [q, setQ] = useState("");
   const [celebrate, setCelebrate] = useState(false);
-  const titleRef = useRef<HTMLInputElement>(null);
   const filtered = useMemo(() => players.filter((p) => !q || p.name.toLowerCase().includes(q.toLowerCase())), [players, q]);
 
   useEffect(() => {
@@ -39,26 +30,57 @@ export function AwardForm({ players, preselect }: { players: { id: string; name:
     <Card className="relative overflow-hidden self-start">
       <CardHeader title="Give an award" />
       <form action={action} className="space-y-4 px-5 pb-5">
-        <div className="flex flex-wrap gap-1.5">
-          {PRESETS.map((p, i) => (
-            <button
-              key={p.title}
-              type="button"
-              onClick={() => { setPreset(i); if (titleRef.current) titleRef.current.value = p.title; }}
-              className={cn("rounded-full border px-2.5 py-1 text-xs font-medium transition", preset === i ? "border-brand bg-brand-soft text-brand" : "border-border text-muted hover:text-text")}
-            >
-              {p.emoji} {p.title}
-            </button>
-          ))}
+        <fieldset>
+          <legend className="mb-1.5 text-sm font-medium">1. Type of award</legend>
+          <div className="grid grid-cols-2 gap-1.5" role="radiogroup" aria-label="Type of award">
+            {AWARD_TYPES.map((t) => {
+              const on = type === t.value;
+              return (
+                <button
+                  key={t.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => {
+                    setType(t.value);
+                    // swap the title to this type's first preset unless the coach typed their own
+                    if (!title || AWARD_TYPES.some((x) => (x.presets as readonly string[]).includes(title))) setTitle(t.presets[0]);
+                  }}
+                  className={cn("flex items-center gap-2 rounded-xl border-2 px-3 py-2 text-left text-sm font-medium transition", on ? "bg-surface-2" : "border-border text-muted hover:text-text")}
+                  style={on ? { borderColor: t.colour } : undefined}
+                >
+                  <span className="size-3 shrink-0 rounded-sm" style={{ background: t.colour }} />
+                  <span>{t.emoji} {t.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-1.5 text-xs text-muted">{awardType(type).hint}</p>
+        </fieldset>
+        <input type="hidden" name="type" value={type} />
+
+        <div>
+          <div className="mb-1.5 text-sm font-medium">2. Title</div>
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {awardType(type).presets.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTitle(t)}
+                className={cn("rounded-full border px-2.5 py-1 text-xs font-medium transition", title === t ? "border-brand bg-brand-soft text-brand" : "border-border text-muted hover:text-text")}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+          <Input name="title" value={title} onChange={(e) => setTitle(e.target.value)} required aria-label="Title" placeholder="Or type your own" />
         </div>
-        <input type="hidden" name="type" value={PRESETS[preset].type} />
-        <Field label="Title"><Input ref={titleRef} name="title" defaultValue={PRESETS[0].title} required /></Field>
-        <Field label="Why? (appears on the certificate)"><Textarea name="reason" rows={2} placeholder="e.g. Brilliant support running and always encouraging teammates" /></Field>
+        <Field label="3. Why? (appears on the certificate)"><Textarea name="reason" rows={2} placeholder="e.g. Brilliant support running and always encouraging teammates" /></Field>
         <Field label="Date"><Input type="date" name="awardedOn" defaultValue={todayISO()} /></Field>
 
         <div>
           <div className="mb-1.5 flex items-center justify-between text-sm font-medium">
-            <span>Players ({selected.length})</span>
+            <span>4. Players ({selected.length})</span>
             {selected.length > 0 && <button type="button" className="text-xs text-muted" onClick={() => setSelected([])}>clear</button>}
           </div>
           <div className="relative mb-2">
