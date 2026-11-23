@@ -1,15 +1,16 @@
 import { and, asc, desc, gt, isNull } from "drizzle-orm";
-import { Button, Card, CardHeader, Input, PageHeader } from "@/components/ui";
+import Link from "next/link";
+import { Button, Card, CardHeader, Input, LinkButton, PageHeader } from "@/components/ui";
 import { db, schema } from "@/db";
 import { requireAdmin } from "@/lib/auth";
 import { appOrigin } from "@/lib/origin";
 import { createSeason, setCurrentSeason, updateAgeGroup } from "./actions";
-import { AssignmentGrid, InviteForm, PendingInvites, UserRow } from "./client";
+import { AssignmentGrid, InviteForm, PendingInvites } from "./client";
 
 export const metadata = { title: "Admin" };
 
 export default async function AdminPage() {
-  const me = await requireAdmin();
+  await requireAdmin();
   const origin = await appOrigin();
   const [users, invites, groups, assignments, seasons] = await Promise.all([
     db.select().from(schema.users).orderBy(asc(schema.users.role), asc(schema.users.name)),
@@ -24,7 +25,7 @@ export default async function AdminPage() {
     <>
       <PageHeader eyebrow="Admin" title="Club settings" subtitle="People, coaching assignments, age groups and seasons." />
       <div className="grid gap-6 xl:grid-cols-2">
-        <Card className="xl:col-span-2">
+        <Card id="invite" className="scroll-mt-20 xl:col-span-2">
           <CardHeader title="Invite someone" subtitle="Creates a one-time sign-up link. Send it by WhatsApp or email; no email server needed." />
           <div className="px-5 pb-5">
             <InviteForm origin={origin} />
@@ -43,11 +44,17 @@ export default async function AdminPage() {
           </div>
         </Card>
 
-        <Card>
-          <CardHeader title={`People (${users.length})`} />
-          <div className="divide-y divide-border px-5 pb-3">
-            {users.map((u) => <UserRow key={u.id} user={{ id: u.id, name: u.name, email: u.email, role: u.role, active: u.active }} isMe={u.id === me.id} />)}
+        <Card className="self-start">
+          <CardHeader title="People" subtitle="Search, filter, change roles, deactivate or delete accounts." action={<LinkButton href="/admin/people" size="sm">Manage people →</LinkButton>} />
+          <div className="grid grid-cols-3 gap-2 px-5 pb-5 text-center">
+            {(["admin", "coach", "parent"] as const).map((r) => (
+              <Link key={r} href="/admin/people" className="rounded-xl bg-surface-2 p-3 transition hover:bg-brand-soft">
+                <div className="text-2xl font-bold tabular-nums">{users.filter((u) => u.role === r && u.active).length}</div>
+                <div className="text-xs text-muted capitalize">{r === "coach" ? "coaches" : `${r}s`}</div>
+              </Link>
+            ))}
           </div>
+          {users.some((u) => !u.active) && <p className="px-5 pb-4 text-xs text-muted">{users.filter((u) => !u.active).length} deactivated</p>}
         </Card>
 
         <div className="space-y-6">

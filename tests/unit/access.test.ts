@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canManageAgeGroup, canManagePlayer, canSeePhoto, canSetConsent, canUnenrol, canUploadPhoto, canViewPlayer, type AccessContext } from "@/lib/access";
+import { canManageAgeGroup, canManagePlayer, canSeePhoto, canDeleteUser, canSetConsent, canUnenrol, canUploadPhoto, canViewPlayer, type AccessContext } from "@/lib/access";
 
 const U6 = "g-u6", U7 = "g-u7";
 const kidA = { id: "p-a", ageGroupId: U6, photoConsent: true };
@@ -65,5 +65,21 @@ describe("unenrolling", () => {
     expect(canUnenrol(parentOfA, kidB)).toBe(false);
     expect(canUnenrol(u6coach, kidA)).toBe(false);
     expect(canUnenrol(admin, kidB)).toBe(true);
+  });
+});
+
+describe("deleting users", () => {
+  const me = "u-me";
+  it("never deletes yourself", () => {
+    expect(canDeleteUser(me, { id: me, role: "admin", active: true }, 3).ok).toBe(false);
+  });
+  it("protects the last active admin", () => {
+    expect(canDeleteUser(me, { id: "u2", role: "admin", active: true }, 1).ok).toBe(false);
+    expect(canDeleteUser(me, { id: "u2", role: "admin", active: true }, 2).ok).toBe(true);
+    expect(canDeleteUser(me, { id: "u2", role: "admin", active: false }, 1).ok).toBe(true);
+  });
+  it("allows deleting coaches and parents", () => {
+    expect(canDeleteUser(me, { id: "c", role: "coach", active: true }, 1).ok).toBe(true);
+    expect(canDeleteUser(me, { id: "p", role: "parent", active: false }, 1).ok).toBe(true);
   });
 });

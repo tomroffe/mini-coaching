@@ -113,5 +113,5 @@ docker/               Caddyfile, entrypoint, backup script
 
 - Follow the RFU safeguarding and photography guidance: record photo consent from a parent or guardian before uploading any photo.
 - Medical notes and emergency contacts are visible only to admins, coaches of that age group, and the child's linked parents.
-- Deactivate coaches who leave (Admin → People). Their sign-in stops working immediately.
+- **Admin → People** lists everyone, with search and role/status filters. **Deactivate** blocks sign-in but keeps their history (best for coaches who leave). **Delete permanently** removes the login. You can't delete yourself or the last active admin, and a parent's children are kept unless you tick the box to delete those with no other linked parent.
 - The RFU U7 rules summary is a coaching aid. The official RFU Regulation 15 remains authoritative and should be re-checked each season.

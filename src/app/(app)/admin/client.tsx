@@ -4,7 +4,7 @@ import { Check, Copy, X } from "lucide-react";
 import { useActionState, useOptimistic, useState, useTransition } from "react";
 import { Button, Input, Select } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { createInvite, revokeInvite, setAssignment, updateUser } from "./actions";
+import { createInvite, revokeInvite, setAssignment } from "./actions";
 
 function CopyLink({ url }: { url: string }) {
   const [done, setDone] = useState(false);
@@ -69,26 +69,6 @@ export function PendingInvites({ invites, origin }: { invites: { token: string; 
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-export function UserRow({ user: u, isMe }: { user: { id: string; name: string; email: string; role: "admin" | "coach" | "parent"; active: boolean }; isMe: boolean }) {
-  const [pending, start] = useTransition();
-  return (
-    <div className={cn("flex flex-wrap items-center gap-2 py-2.5", !u.active && "opacity-50", pending && "animate-pulse")}>
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-medium">{u.name}{isMe && <span className="ml-1 text-xs text-brand">(you)</span>}</div>
-        <div className="truncate text-xs text-muted">{u.email}</div>
-      </div>
-      <select value={u.role} onChange={(e) => start(() => updateUser(u.id, { role: e.target.value as typeof u.role }))} className="h-8 rounded-lg border border-border bg-surface px-2 text-xs" aria-label="Role">
-        <option value="admin">Admin</option>
-        <option value="coach">Coach</option>
-        <option value="parent">Parent</option>
-      </select>
-      <button onClick={() => start(() => updateUser(u.id, { active: !u.active }))} className="h-8 rounded-lg border border-border px-2 text-xs text-muted hover:text-text">
-        {u.active ? "Deactivate" : "Reactivate"}
-      </button>
     </div>
   );
 }

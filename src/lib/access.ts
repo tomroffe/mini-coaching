@@ -66,3 +66,13 @@ export function canUnenrol(ctx: AccessContext, p: PlayerLike): boolean {
   if (ctx.role === "admin") return true;
   return ctx.role === "parent" && ctx.childIds.includes(p.id);
 }
+
+/**
+ * Admin deleting a user: never yourself, and never the last active admin
+ * (otherwise nobody could manage the club).
+ */
+export function canDeleteUser(actorId: string, target: { id: string; role: string; active: boolean }, activeAdminCount: number): { ok: boolean; reason?: string } {
+  if (target.id === actorId) return { ok: false, reason: "You can't delete your own account here." };
+  if (target.role === "admin" && target.active && activeAdminCount <= 1) return { ok: false, reason: "This is the last active admin." };
+  return { ok: true };
+}
