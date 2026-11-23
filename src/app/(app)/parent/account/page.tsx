@@ -31,7 +31,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           {unenrolled} has been unenrolled and their record deleted.
         </Card>
       )}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader title="Unenrol a child" subtitle="Removes your child from the minis section. Their record, attendance, awards and any photo are permanently deleted." />
           <div className="space-y-3 px-5 pb-5">

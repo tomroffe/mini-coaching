@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ClipboardCheck, FastForward, MoreHorizontal, Trash2, UserRoundCheck } from "lucide-react";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/utils";
 import { cancelWeekAndShift, deleteWeek, updateWeek } from "./actions";
 
@@ -20,6 +20,14 @@ const STATUS = {
 export function WeekRow({ week: w, plans, isNext, isPast, available, attended, canEdit, colour }: { week: Week; plans: PlanOpt[]; isNext: boolean; isPast: boolean; available: number; attended?: number; canEdit: boolean; colour: string }) {
   const [pending, start] = useTransition();
   const [menu, setMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  // close the menu on any tap/click outside it (mouse-leave never fires on touch screens)
+  useEffect(() => {
+    if (!menu) return;
+    const close = (e: PointerEvent) => { if (!menuRef.current?.contains(e.target as Node)) setMenu(false); };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [menu]);
   const [msg, setMsg] = useState<string | null>(null);
   const d = new Date(w.date + "T12:00:00");
   const plan = plans.find((p) => p.id === w.sessionPlanId);
@@ -76,27 +84,27 @@ export function WeekRow({ week: w, plans, isNext, isPast, available, attended, c
         {msg && <p className="mt-1 text-xs text-amber-600">{msg}</p>}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="-mb-1 flex w-full shrink-0 items-center justify-end gap-1 border-t border-border/60 pt-1 sm:mb-0 sm:w-auto sm:border-0 sm:pt-0">
         {plan && (
-          <Link href={`/sessions/${plan.id}`} className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-brand hover:bg-brand-soft">
+          <Link href={`/sessions/${plan.id}`} className="mr-auto flex min-h-10 items-center rounded-lg px-2.5 text-sm font-medium text-brand hover:bg-brand-soft sm:mr-0 sm:min-h-0 sm:py-1.5">
             Plan
           </Link>
         )}
-        <Link href={`/coaches?week=${w.id}`} className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-muted hover:bg-surface-2" title="Coaches available">
+        <Link href={`/coaches?week=${w.id}`} className="flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-xs text-muted hover:bg-surface-2 sm:min-h-0 sm:py-1.5" title="Coaches available" aria-label={`${available} coaches available`}>
           <UserRoundCheck className="size-4" /> {available}
         </Link>
         {w.status !== "cancelled" && w.status !== "no_session" && (
-          <Link href={`/register/${w.id}`} className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-muted hover:bg-surface-2" title="Register">
+          <Link href={`/register/${w.id}`} className="flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-xs text-muted hover:bg-surface-2 sm:min-h-0 sm:py-1.5" title="Register" aria-label="Register">
             <ClipboardCheck className="size-4" /> {attended ?? "–"}
           </Link>
         )}
         {canEdit && (
-          <div className="relative">
-            <button onClick={() => setMenu((m) => !m)} className="rounded-lg p-1.5 text-muted hover:bg-surface-2" aria-label="More">
+          <div className="relative" ref={menuRef}>
+            <button onClick={() => setMenu((m) => !m)} className="flex size-10 items-center justify-center rounded-lg text-muted hover:bg-surface-2 sm:size-8" aria-label="Week actions" aria-expanded={menu}>
               <MoreHorizontal className="size-4" />
             </button>
             {menu && (
-              <div className="absolute right-0 z-20 mt-1 w-64 overflow-hidden rounded-xl border border-border bg-surface text-sm shadow-xl" onMouseLeave={() => setMenu(false)}>
+              <div className="absolute right-0 z-20 mt-1 w-64 overflow-hidden rounded-xl border border-border bg-surface text-sm shadow-xl" role="menu">
                 {w.status === "training" && (
                   <button
                     className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-surface-2"

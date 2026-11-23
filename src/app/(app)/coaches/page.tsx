@@ -58,7 +58,7 @@ export default async function CoachesPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <PageHeader eyebrow="Coaches" title="Availability" subtitle="Tap your row to say whether you can make each session. Columns turn amber when fewer than two coaches are available." />
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0">
         {groups.map((g) => (
           <Link
             key={g.id}

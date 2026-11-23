@@ -1,6 +1,8 @@
 import { and, asc, desc, gt, isNull } from "drizzle-orm";
 import Link from "next/link";
-import { Button, Card, CardHeader, Input, LinkButton, PageHeader } from "@/components/ui";
+import { Save } from "lucide-react";
+import { Button, Card, CardHeader, Field, Input, LinkButton, PageHeader } from "@/components/ui";
+import { fmtDate } from "@/lib/utils";
 import { db, schema } from "@/db";
 import { requireAdmin } from "@/lib/auth";
 import { appOrigin } from "@/lib/origin";
@@ -24,7 +26,7 @@ export default async function AdminPage() {
   return (
     <>
       <PageHeader eyebrow="Admin" title="Club settings" subtitle="People, coaching assignments, age groups and seasons." />
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card id="invite" className="scroll-mt-20 xl:col-span-2">
           <CardHeader title="Invite someone" subtitle="Creates a one-time sign-up link. Send it by WhatsApp or email; no email server needed." />
           <div className="px-5 pb-5">
@@ -62,19 +64,25 @@ export default async function AdminPage() {
             <CardHeader title="Seasons" />
             <div className="space-y-2 px-5 pb-5">
               {seasons.map((s) => (
-                <div key={s.id} className="flex items-center justify-between rounded-xl bg-surface-2 px-3 py-2 text-sm">
-                  <div><span className="font-semibold">{s.name}</span> <span className="text-muted">{s.startDate} → {s.endDate}</span></div>
+                <div key={s.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl bg-surface-2 px-3 py-2 text-sm">
+                  <div className="min-w-0">
+                    <span className="font-semibold">{s.name}</span>{" "}
+                    <span className="text-muted">{fmtDate(s.startDate, { day: "numeric", month: "short", year: "numeric" })} → {fmtDate(s.endDate, { day: "numeric", month: "short", year: "numeric" })}</span>
+                  </div>
                   {s.current ? <span className="text-xs font-semibold text-brand">Current</span> : (
                     <form action={setCurrentSeason.bind(null, s.id)}><Button size="sm" variant="ghost">Make current</Button></form>
                   )}
                 </div>
               ))}
-              <form action={createSeason} className="grid grid-cols-2 gap-2 pt-2">
-                <Input name="name" placeholder="2027-28" required className="col-span-2" />
-                <Input type="date" name="startDate" required />
-                <Input type="date" name="endDate" required />
-                <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="current" className="accent-[var(--brand)]" /> Make current</label>
-                <Button size="sm">Add season</Button>
+              <form action={createSeason} className="grid grid-cols-1 gap-3 border-t border-border pt-4 sm:grid-cols-2">
+                <div className="text-sm font-semibold sm:col-span-2">Add a season</div>
+                <Field label="Name" className="sm:col-span-2"><Input name="name" placeholder="2027-28" required /></Field>
+                <Field label="Start"><Input type="date" name="startDate" required /></Field>
+                <Field label="End"><Input type="date" name="endDate" required /></Field>
+                <div className="flex items-center justify-between gap-3 sm:col-span-2">
+                  <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="current" className="accent-[var(--brand)]" /> Make current</label>
+                  <Button size="sm">Add season</Button>
+                </div>
               </form>
             </div>
           </Card>
@@ -85,9 +93,11 @@ export default async function AdminPage() {
               {groups.map((g) => (
                 <form key={g.id} action={updateAgeGroup.bind(null, g.id)} className="flex items-center gap-2">
                   <input type="color" name="colour" defaultValue={g.colour} className="size-9 shrink-0 cursor-pointer rounded-lg border border-border bg-surface p-0.5" aria-label={`${g.code} colour`} />
-                  <span className="w-12 font-semibold">{g.code}</span>
-                  <Input name="name" defaultValue={g.name} className="h-9" />
-                  <Button size="sm" variant="secondary">Save</Button>
+                  <span className="w-10 shrink-0 font-semibold sm:w-12">{g.code}</span>
+                  <Input name="name" defaultValue={g.name} className="h-9 min-w-0" aria-label={`${g.code} name`} />
+                  <Button size="sm" variant="secondary" className="shrink-0" aria-label={`Save ${g.code}`}>
+                    <Save className="size-4 sm:hidden" /><span className="hidden sm:inline">Save</span>
+                  </Button>
                 </form>
               ))}
             </div>

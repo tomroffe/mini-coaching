@@ -75,7 +75,7 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
         }
       />
 
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0">
         {groups.map((g) => (
           <Link
             key={g.id}
@@ -90,7 +90,7 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
       </div>
 
       {group.code === "U6" && (
-        <div className="-mx-4 mb-6 flex snap-x gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
+        <div className="-mx-4 mb-6 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
           {SEASON_PATHWAY.map((p) => (
             <div key={p.period} className="w-56 shrink-0 snap-start rounded-xl border border-border bg-surface p-3 sm:w-auto">
               <div className="text-xs font-semibold text-brand">{p.period}</div>

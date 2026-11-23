@@ -30,9 +30,10 @@ export function TimelineBar({ blocks, startTime = "09:30", compact, className }:
               title={`${start} · ${b.title} · ${b.durationMin} min`}
             >
               {!compact && (
-                <div className="flex h-full flex-col justify-center px-2 leading-tight">
-                  <span className="truncate text-[11px] font-semibold">{b.title}</span>
-                  <span className="text-[10px] opacity-85">{b.durationMin}′</span>
+                <div className="flex h-full flex-col justify-center px-1.5 leading-tight sm:px-2">
+                  {/* phones: minutes only. The block list below names each block. */}
+                  <span className="hidden truncate text-[11px] font-semibold sm:block">{b.title}</span>
+                  <span className="text-center text-xs font-semibold opacity-90 sm:text-left sm:text-[10px] sm:font-normal">{b.durationMin}′</span>
                 </div>
               )}
             </motion.div>

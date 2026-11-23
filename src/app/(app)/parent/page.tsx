@@ -72,7 +72,7 @@ export default async function ParentPage({ searchParams }: { searchParams: Promi
                 </div>
               </Card>
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Card>
                   <CardHeader title="Next session" />
                   <div className="px-5 pb-5">

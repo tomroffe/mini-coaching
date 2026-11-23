@@ -17,7 +17,7 @@ export function MediaManager({ drillId, slug, media, canEdit }: { drillId: strin
       <CardHeader title="Videos & media" subtitle="Demo videos, photos of the set-up, or useful links." />
       <div className="space-y-4 px-5 pb-5">
         {media.length === 0 && <p className="text-sm text-muted">Nothing added yet.</p>}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {media.map((m) => (
             <figure key={m.id} className="group relative overflow-hidden rounded-xl border border-border bg-surface-2">
               {(m.type === "youtube" || m.type === "vimeo") && (

@@ -5,7 +5,7 @@ import { cn, initials } from "@/lib/utils";
 type BtnVariant = "primary" | "secondary" | "ghost" | "danger";
 const btn = (variant: BtnVariant = "primary", size: "sm" | "md" = "md") =>
   cn(
-    "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+    "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl font-medium transition active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
     size === "sm" ? "h-8 px-3 text-sm" : "h-10 px-4 text-sm",
     variant === "primary" && "bg-brand text-brand-fg hover:brightness-110 shadow-sm",
     variant === "secondary" && "bg-surface border border-border hover:bg-surface-2",
@@ -22,13 +22,13 @@ export function LinkButton({ variant, size, className, ...p }: ComponentProps<ty
 }
 
 export function Card({ className, ...p }: ComponentProps<"div">) {
-  return <div className={cn("rounded-2xl border border-border bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04)]", className)} {...p} />;
+  return <div className={cn("min-w-0 rounded-2xl border border-border bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04)]", className)} {...p} />;
 }
 
 export function CardHeader({ title, action, subtitle }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-3 px-5 pt-4 pb-2">
-      <div>
+      <div className="min-w-0">
         <h3 className="font-semibold">{title}</h3>
         {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
       </div>
@@ -39,13 +39,18 @@ export function CardHeader({ title, action, subtitle }: { title: ReactNode; subt
 
 export function PageHeader({ title, subtitle, actions, eyebrow }: { title: ReactNode; subtitle?: ReactNode; actions?: ReactNode; eyebrow?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-3 sm:mb-6">
       <div className="min-w-0">
         {eyebrow && <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-brand">{eyebrow}</div>}
         <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 text-muted">{subtitle}</p>}
+        {subtitle && <p className="mt-1 line-clamp-2 text-sm text-muted sm:line-clamp-none sm:text-base">{subtitle}</p>}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && (
+        // phones: one row that scrolls sideways instead of stacking full-width buttons
+        <div className="-mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&>*]:shrink-0">
+          {actions}
+        </div>
+      )}
     </div>
   );
 }

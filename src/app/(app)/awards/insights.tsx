@@ -100,7 +100,7 @@ export function AwardInsights({ players, groups, awards, season }: { players: Pl
       </div>
 
       {/* Headline + coverage meters */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-4">
           <div className="text-xs font-medium tracking-wide text-muted uppercase">Players with an award</div>
           <div className="mt-1 text-3xl font-bold tabular-nums">

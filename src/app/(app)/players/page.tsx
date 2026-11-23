@@ -48,7 +48,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
         <Empty title="You're not assigned to an age group yet">Ask a club admin to add you as a coach for your age group (Admin → Coaches).</Empty>
       ) : (
         <>
-          <div className="mb-6 flex flex-wrap gap-2">
+          <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0">
             <Link href="/players" className={cn("rounded-full border px-3 py-1 text-sm font-medium", !group ? "border-brand bg-brand text-brand-fg" : "border-border bg-surface text-muted")}>All</Link>
             {groups.map((g) => (
               <Link key={g.id} href={`/players?age=${g.code}`} className={cn("rounded-full border px-3 py-1 text-sm font-medium", group?.id === g.id ? "border-transparent text-white" : "border-border bg-surface text-muted")} style={group?.id === g.id ? { background: g.colour } : undefined}>

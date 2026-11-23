@@ -87,6 +87,12 @@
   --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Grid and flex items may shrink below their content width: stops wide tables or long
+   words from stretching a column past the screen edge on phones. */
+.grid > * {
+  min-width: 0;
+}
+
 html,
 body {
   background: var(--bg);

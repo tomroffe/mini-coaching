@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Award,
   CalendarDays,
@@ -8,6 +8,7 @@ import {
   Home,
   LayoutList,
   LogOut,
+  Menu,
   Moon,
   Settings,
   Shapes,
@@ -26,10 +27,10 @@ type Role = "admin" | "coach" | "parent";
 const ITEMS = [
   { href: "/", label: "Home", icon: Home, roles: ["admin", "coach"], mobile: true },
   { href: "/season", label: "Season", icon: CalendarDays, roles: ["admin", "coach"], mobile: true },
-  { href: "/sessions", label: "Plans", icon: LayoutList, roles: ["admin", "coach"], mobile: true },
-  { href: "/drills", label: "Drills", icon: Shapes, roles: ["admin", "coach"], mobile: true },
+  { href: "/register", label: "Register", icon: ClipboardCheck, roles: ["admin", "coach"], mobile: true },
   { href: "/players", label: "Players", icon: Users, roles: ["admin", "coach"], mobile: true },
-  { href: "/register", label: "Register", icon: ClipboardCheck, roles: ["admin", "coach"] },
+  { href: "/sessions", label: "Plans", icon: LayoutList, roles: ["admin", "coach"] },
+  { href: "/drills", label: "Drills", icon: Shapes, roles: ["admin", "coach"] },
   { href: "/coaches", label: "Coaches", icon: UserRoundCheck, roles: ["admin", "coach"] },
   { href: "/awards", label: "Awards", icon: Award, roles: ["admin", "coach"] },
   { href: "/parent", label: "My child", icon: Home, roles: ["parent"], mobile: true },
@@ -49,6 +50,10 @@ export function Nav({ user }: { user: { name: string; role: Role } }) {
   // Only the most specific matching link is active (/parent vs /parent/account)
   const activeHref = items.filter((i) => matches(path, i.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href;
   const isActive = (_: string, href: string) => href === activeHref;
+  const moreItems = items.filter((i) => !("mobile" in i && i.mobile));
+  const activeItem = items.find((i) => i.href === activeHref);
+  const [moreOpen, setMoreOpen] = useState(false);
+  useEffect(() => setMoreOpen(false), [path]);
 
   return (
     <>
@@ -95,42 +100,96 @@ export function Nav({ user }: { user: { name: string; role: Role } }) {
         </div>
       </aside>
 
-      {/* Mobile top bar */}
-      <header className="no-print sticky top-0 z-30 flex items-center justify-between border-b border-border bg-surface/85 px-4 py-2.5 backdrop-blur lg:hidden" style={{ paddingTop: "max(0.625rem, env(safe-area-inset-top))" }}>
-        <Link href="/" className="flex items-center gap-2">
+      {/* Mobile top bar: logo + where you are */}
+      <header className="no-print sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-surface/85 px-4 py-2.5 backdrop-blur lg:hidden" style={{ paddingTop: "max(0.625rem, env(safe-area-inset-top))" }}>
+        <Link href={user.role === "parent" ? "/parent" : "/"} className="flex items-center gap-2" aria-label="Minis Coach home">
           <Logo size={28} />
           <span className="font-display font-bold">Minis Coach</span>
         </Link>
-        <div className="flex items-center">
-          {items
-            .filter((i) => !("mobile" in i && i.mobile))
-            .map((i) => (
-              <Link key={i.href} href={i.href} aria-label={i.label} className={cn("rounded-lg p-2", isActive(path, i.href) ? "text-brand" : "text-muted")}>
-                <i.icon className="size-5" />
-              </Link>
-            ))}
-          <ThemeToggle />
-          <form action="/logout" method="post">
-            <button className="rounded-lg p-2 text-muted" aria-label="Sign out">
-              <LogOut className="size-5" />
-            </button>
-          </form>
-        </div>
+        {activeItem && activeItem.href !== "/" && (
+          <span className="truncate text-sm text-muted">
+            <span className="mr-1.5 text-border">/</span>
+            {activeItem.label}
+          </span>
+        )}
       </header>
 
       {/* Mobile bottom tabs */}
-      <nav className="no-print fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-surface/95 backdrop-blur lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <nav className="no-print fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-surface/95 backdrop-blur lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }} aria-label="Main">
         {mobileItems.map((i) => {
-          const active = isActive(path, i.href);
+          const active = isActive(path, i.href) && !moreOpen;
           return (
-            <Link key={i.href} href={i.href} className={cn("relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium", active ? "text-brand" : "text-muted")}>
+            <Link key={i.href} href={i.href} aria-current={active ? "page" : undefined} className={cn("relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium", active ? "text-brand" : "text-muted")}>
               {active && <motion.span layoutId="tab-dot" className="absolute top-0 h-0.5 w-8 rounded-full bg-brand" />}
               <i.icon className="size-5" />
               {i.label}
             </Link>
           );
         })}
+        <button
+          type="button"
+          onClick={() => setMoreOpen((o) => !o)}
+          aria-expanded={moreOpen}
+          aria-controls="more-sheet"
+          className={cn("relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium", moreOpen || moreItems.some((m) => m.href === activeHref) ? "text-brand" : "text-muted")}
+        >
+          {!moreOpen && moreItems.some((m) => m.href === activeHref) && <motion.span layoutId="tab-dot" className="absolute top-0 h-0.5 w-8 rounded-full bg-brand" />}
+          <Menu className="size-5" />
+          More
+        </button>
       </nav>
+
+      {/* "More" bottom sheet */}
+      <AnimatePresence>
+        {moreOpen && (
+          <>
+            <motion.div className="no-print fixed inset-0 z-30 bg-black/40 lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMoreOpen(false)} />
+            <motion.div
+              id="more-sheet"
+              role="dialog"
+              aria-label="More"
+              className="no-print fixed inset-x-0 bottom-0 z-30 rounded-t-3xl border-t border-border bg-surface px-4 pt-3 shadow-2xl lg:hidden"
+              style={{ paddingBottom: "calc(4.5rem + env(safe-area-inset-bottom))" }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 420, damping: 40 }}
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={{ top: 0, bottom: 0.6 }}
+              onDragEnd={(_, info) => { if (info.offset.y > 80) setMoreOpen(false); }}
+            >
+              <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-border" />
+              <div className="mb-3 px-1">
+                <div className="font-semibold">{user.name}</div>
+                <div className="text-xs text-muted capitalize">{user.role}</div>
+              </div>
+              {moreItems.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {moreItems.map((i) => (
+                    <Link
+                      key={i.href}
+                      href={i.href}
+                      className={cn("flex flex-col items-center gap-1.5 rounded-2xl p-3 text-sm font-medium transition", isActive(path, i.href) ? "bg-brand-soft text-brand" : "bg-surface-2 text-text hover:bg-brand-soft")}
+                    >
+                      <i.icon className="size-6" />
+                      {i.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <div className="mt-3 divide-y divide-border rounded-2xl bg-surface-2">
+                <ThemeToggle row />
+                <form action="/logout" method="post">
+                  <button className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium text-danger">
+                    <LogOut className="size-5" /> Sign out
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
@@ -147,27 +206,31 @@ export function Logo({ size = 36 }: { size?: number }) {
   );
 }
 
-function ThemeToggle() {
+function ThemeToggle({ row }: { row?: boolean }) {
   const [dark, setDark] = useState<boolean | null>(null);
   useEffect(() => {
     const t = document.documentElement.dataset.theme;
     setDark(t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches);
   }, []);
+  const toggle = () => {
+    const next = !dark;
+    setDark(next);
+    const t = next ? "dark" : "light";
+    document.documentElement.dataset.theme = t;
+    try {
+      localStorage.setItem("theme", t);
+    } catch {}
+  };
+  if (row) {
+    return (
+      <button type="button" onClick={toggle} className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium">
+        {dark ? <Sun className="size-5" /> : <Moon className="size-5" />}
+        {dark ? "Light mode" : "Dark mode"}
+      </button>
+    );
+  }
   return (
-    <button
-      className="rounded-lg p-2 text-muted hover:bg-surface-2 hover:text-text"
-      aria-label="Toggle dark mode"
-      title="Toggle dark mode"
-      onClick={() => {
-        const next = !dark;
-        setDark(next);
-        const t = next ? "dark" : "light";
-        document.documentElement.dataset.theme = t;
-        try {
-          localStorage.setItem("theme", t);
-        } catch {}
-      }}
-    >
+    <button className="rounded-lg p-2 text-muted hover:bg-surface-2 hover:text-text" aria-label="Toggle dark mode" title="Toggle dark mode" onClick={toggle}>
       {dark ? <Sun className="size-4.5" /> : <Moon className="size-4.5" />}
     </button>
   );

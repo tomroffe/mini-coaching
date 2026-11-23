@@ -83,7 +83,7 @@ export function EnrolQr({ groups, defaultGroupId }: { groups: Group[]; defaultGr
   return (
     <>
       <Button variant="secondary" onClick={() => { setOpen(true); generate(groupId); }}>
-        <QrCode className="size-4" /> Enrol a family
+        <QrCode className="size-4" /> <span className="sm:hidden">Enrol</span><span className="hidden sm:inline">Enrol a family</span>
       </Button>
       <AnimatePresence>
         {open && (

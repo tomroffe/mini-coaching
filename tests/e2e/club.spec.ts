@@ -93,7 +93,7 @@ test("cancel a week shifts the sequence forward", async ({ page }) => {
   const rows = page.locator("select[aria-label='Session plan']");
   const secondBefore = await rows.nth(1).locator("option:checked").textContent();
   page.once("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: "More" }).nth(1).click();
+  await page.getByRole("button", { name: "Week actions" }).nth(1).click();
   await page.getByText("Cancel & shift sequence").click();
   await expect(page.getByText("1 cancelled")).toBeVisible();
   // the plan from week 2 is now on week 3 (the 2nd remaining plan select)

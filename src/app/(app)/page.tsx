@@ -114,7 +114,7 @@ export default async function Dashboard() {
         <Stat label="Upcoming" value={upcoming.length} hint="sessions scheduled" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader title="Recent awards" action={<Link href="/awards" className="text-sm text-brand">All →</Link>} />
           <ul className="space-y-1 px-5 pb-5">

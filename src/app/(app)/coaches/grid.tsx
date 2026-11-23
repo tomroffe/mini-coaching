@@ -23,7 +23,7 @@ export function AvailabilityGrid({ me, isAdmin, weeks, coaches, availability, fo
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr>
-            <th className="sticky left-0 z-10 bg-surface p-3 text-left font-semibold">Coach</th>
+            <th className="sticky left-0 z-10 bg-surface p-2 text-left font-semibold sm:p-3">Coach</th>
             {weeks.map((w) => {
               const d = new Date(w.date + "T12:00");
               return (
@@ -41,8 +41,8 @@ export function AvailabilityGrid({ me, isAdmin, weeks, coaches, availability, fo
             const editable = c.id === me || isAdmin;
             return (
               <tr key={c.id} className={cn("border-t border-border", c.id === me && "bg-brand-soft/40")}>
-                <td className="sticky left-0 z-10 bg-inherit p-3 whitespace-nowrap backdrop-blur">
-                  <div className="font-medium">{c.name}{c.id === me && <span className="ml-1 text-xs text-brand">(you)</span>}</div>
+                <td className={cn("sticky left-0 z-10 max-w-[7.5rem] p-2 sm:max-w-none sm:p-3 sm:whitespace-nowrap", c.id === me ? "bg-brand-soft" : "bg-surface")}>
+                  <div className="truncate font-medium" title={c.name}>{c.name}{c.id === me && <span className="ml-1 text-xs text-brand">(you)</span>}</div>
                   <div className="text-xs text-muted">{c.head ? "Head coach" : c.assigned ? "Assistant" : "Helper"}</div>
                 </td>
                 {weeks.map((w) => {
@@ -77,7 +77,7 @@ export function AvailabilityGrid({ me, isAdmin, weeks, coaches, availability, fo
         </tbody>
         <tfoot>
           <tr className="border-t-2 border-border">
-            <td className="sticky left-0 bg-surface p-3 text-xs font-semibold text-muted">Available</td>
+            <td className="sticky left-0 bg-surface p-2 text-xs font-semibold text-muted sm:p-3">Available</td>
             {weeks.map((w) => {
               const n = state.filter((a) => a.weekId === w.id && a.status === "available").length;
               return (

@@ -50,7 +50,7 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
         {cat && <input type="hidden" name="cat" value={cat} />}
         {age && <input type="hidden" name="age" value={age} />}
       </form>
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0">
         <Chip href={href({ cat: "" })} active={!cat}>All</Chip>
         {categories.map((c) => (
           <Chip key={c} href={href({ cat: c === cat ? "" : c })} active={c === cat}>
@@ -68,7 +68,7 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
       {drills.length === 0 ? (
         <Empty title="No drills match">Try a different search or clear the filters.</Empty>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {drills.map((d) => (
             <Link key={d.id} href={`/drills/${d.slug}`} className="group">
               <Card className="h-full overflow-hidden transition group-hover:-translate-y-0.5 group-hover:shadow-lg">

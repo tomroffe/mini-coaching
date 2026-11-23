@@ -22,9 +22,14 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
 
   return (
     <>
-      <Link href="/drills" className="no-print mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-text">
-        <ArrowLeft className="size-4" /> Drill library
-      </Link>
+      <div className="no-print mb-4 flex items-center justify-between gap-2">
+        <Link href="/drills" className="inline-flex items-center gap-1 py-2 text-sm text-muted hover:text-text">
+          <ArrowLeft className="size-4" /> Drill library
+        </Link>
+        <LinkButton href={`/drills/${drill.slug}/edit`} variant="secondary" size="sm" className="sm:hidden">
+          <Pencil className="size-4" /> Edit
+        </LinkButton>
+      </div>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="mb-2 flex flex-wrap gap-1.5">
@@ -34,12 +39,12 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
           <h1 className="text-3xl font-bold">{drill.title}</h1>
           <p className="mt-1 max-w-2xl text-muted">{drill.summary}</p>
         </div>
-        <LinkButton href={`/drills/${drill.slug}/edit`} variant="secondary" className="no-print">
+        <LinkButton href={`/drills/${drill.slug}/edit`} variant="secondary" className="no-print hidden sm:inline-flex">
           <Pencil className="size-4" /> Edit
         </LinkButton>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="space-y-6">
           {drill.diagram && <DrillDiagram diagram={drill.diagram} autoPlay />}
           <MediaManager drillId={drill.id} slug={drill.slug} media={drill.media} canEdit={user.role !== "parent"} />

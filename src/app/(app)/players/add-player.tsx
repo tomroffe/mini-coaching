@@ -14,7 +14,7 @@ export function AddPlayer({ groups, defaultGroupId }: { groups: { id: string; co
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}><UserPlus className="size-4" /> Add player</Button>
+      <Button onClick={() => setOpen(true)}><UserPlus className="size-4" /> <span className="sm:hidden">Add</span><span className="hidden sm:inline">Add player</span></Button>
       <AnimatePresence>
         {open && (
           <motion.div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)}>

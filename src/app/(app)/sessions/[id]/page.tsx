@@ -1,16 +1,16 @@
 import { asc, eq } from "drizzle-orm";
-import { ArrowLeft, CalendarDays, Droplets, Flag, Package, Pencil, Target, Zap } from "lucide-react";
+import { ArrowLeft, CalendarDays, Droplets, Flag, Package, Target, Zap } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DrillDiagram } from "@/components/diagram/drill-diagram";
 import { TimelineBar } from "@/components/plan/timeline-bar";
-import { Badge, Button, Card, LinkButton, Select } from "@/components/ui";
+import { Badge, Card } from "@/components/ui";
 import { db, schema } from "@/db";
 import { requireStaff } from "@/lib/auth";
 import { BLOCK_TYPES } from "@/lib/curriculum";
 import { addMinutes, fmtDate } from "@/lib/utils";
 import { duplicatePlan } from "../actions";
-import { PrintButton } from "./print-button";
+import { PlanActions } from "./plan-actions";
 
 export default async function PlanPage({ params }: { params: Promise<{ id: string }> }) {
   await requireStaff();
@@ -34,9 +34,12 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
 
   return (
     <>
-      <Link href="/sessions" className="no-print mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-text">
-        <ArrowLeft className="size-4" /> Session plans
-      </Link>
+      <div className="no-print mb-4 flex items-center justify-between gap-2">
+        <Link href="/sessions" className="inline-flex items-center gap-1 py-2 text-sm text-muted hover:text-text">
+          <ArrowLeft className="size-4" /> Session plans
+        </Link>
+        <PlanActions variant="mobile" planId={plan.id} ageGroupId={plan.ageGroupId} groups={groups.map((g) => ({ id: g.id, code: g.code }))} duplicate={duplicatePlan.bind(null, plan.id)} />
+      </div>
 
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -52,16 +55,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
             </p>
           )}
         </div>
-        <div className="no-print flex flex-wrap gap-2">
-          <PrintButton />
-          <form action={duplicatePlan.bind(null, plan.id)} className="flex gap-1">
-            <Select name="ageGroupId" defaultValue={plan.ageGroupId ?? ""} className="h-10 w-24" aria-label="Copy to age group">
-              {groups.map((g) => <option key={g.id} value={g.id}>{g.code}</option>)}
-            </Select>
-            <Button variant="secondary">Duplicate</Button>
-          </form>
-          <LinkButton href={`/sessions/${plan.id}/edit`}><Pencil className="size-4" /> Edit plan</LinkButton>
-        </div>
+        <PlanActions variant="desktop" planId={plan.id} ageGroupId={plan.ageGroupId} groups={groups.map((g) => ({ id: g.id, code: g.code }))} duplicate={duplicatePlan.bind(null, plan.id)} />
       </div>
 
       {plan.outcome && (
@@ -100,7 +94,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
               </div>
               {b.coachFocus && <p className="mb-3 max-w-3xl text-sm"><span className="font-semibold">Coach focus: </span>{b.coachFocus}</p>}
               {b.drill?.diagram && b.blockType !== "water" && (
-                <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
                   <DrillDiagram diagram={b.drill.diagram} />
                   <div className="space-y-2 text-sm">
                     {b.drill.setup && <p><span className="font-semibold">Set-up: </span>{b.drill.setup}</p>}

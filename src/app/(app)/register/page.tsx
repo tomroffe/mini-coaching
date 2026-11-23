@@ -29,7 +29,7 @@ export default async function RegisterIndex() {
       {weeks.length === 0 ? (
         <Empty icon={<ClipboardCheck className="size-8" />} title="No sessions in the last 5 weeks or next 2">Add weeks on the Season page.</Empty>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {weeks.map((w) => {
             const g = gById.get(w.ageGroupId)!;
             const isToday = w.date === today;

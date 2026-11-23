@@ -285,7 +285,7 @@ export function DiagramEditor({ value, onChange }: { value: Diagram; onChange: (
       {preview ? (
         <DrillDiagram diagram={d} autoPlay />
       ) : (
-        <div className="grid gap-3 lg:grid-cols-[1fr_15rem]">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_15rem]">
           <div className="relative">
             <DiagramSvg
               svgRef={svgRef}

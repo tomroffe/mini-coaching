@@ -41,7 +41,7 @@ export default async function SessionsPage({ searchParams }: { searchParams: Pro
           </form>
         }
       />
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0">
         <Link href="/sessions" className={`rounded-full border px-3 py-1 text-sm font-medium ${!age ? "border-brand bg-brand text-brand-fg" : "border-border bg-surface text-muted"}`}>All</Link>
         {groups.filter((g) => plans.some((p) => p.ageGroupId === g.id)).map((g) => (
           <Link key={g.id} href={`/sessions?age=${g.code}`} className={`rounded-full border px-3 py-1 text-sm font-medium ${age === g.code ? "border-brand bg-brand text-brand-fg" : "border-border bg-surface text-muted"}`}>{g.code}</Link>
@@ -56,7 +56,7 @@ export default async function SessionsPage({ searchParams }: { searchParams: Pro
             <span className="size-3 rounded-full" style={{ background: sec.colour }} /> {sec.label}
             <span className="text-sm font-normal text-muted">({sec.items.length})</span>
           </h2>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {sec.items.map((p) => {
               const dates = datesByPlan.get(p.id) ?? [];
               return (
