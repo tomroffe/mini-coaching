@@ -4,6 +4,8 @@ import { Card, CardHeader, Empty, PageHeader } from "@/components/ui";
 import { db, schema } from "@/db";
 import { requireAccess } from "@/lib/authz";
 import { cn, todayISO } from "@/lib/utils";
+import { appOrigin } from "@/lib/origin";
+import { CalendarSync } from "./calendar-sync";
 import { AvailabilityGrid } from "./grid";
 
 export const metadata = { title: "Coaches" };
@@ -54,6 +56,8 @@ export default async function CoachesPage({ searchParams }: { searchParams: Prom
     .where(eq(schema.seasonWeeks.ageGroupId, group.id))
     .groupBy(schema.coachAttendance.userId);
   const tallyBy = new Map(tally.map((t) => [t.userId, t.n]));
+  const [me] = await db.select({ token: schema.users.calendarToken }).from(schema.users).where(eq(schema.users.id, ctx.user.id));
+  const feedUrl = me?.token ? `${await appOrigin()}/cal/${me.token}.ics` : null;
 
   return (
     <>
@@ -82,6 +86,10 @@ export default async function CoachesPage({ searchParams }: { searchParams: Prom
           availability={avail.map((a) => ({ weekId: a.seasonWeekId, userId: a.userId, status: a.status }))}
         />
       )}
+
+      <div className="mt-8">
+        <CalendarSync feedUrl={feedUrl} />
+      </div>
 
       <Card className="mt-8">
         <CardHeader title={`${group.code} coaching team`} subtitle="Sessions attended this season (recorded on the register)." />

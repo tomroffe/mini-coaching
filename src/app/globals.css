@@ -1,6 +1,17 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* dark: applies when the in-app toggle says dark, OR the device is dark and the toggle
+   hasn't forced light (matches the token blocks below). */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
 
 /* Club palette: change --brand / --accent to re-skin the whole app. */
 :root {

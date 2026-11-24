@@ -36,6 +36,8 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   role: roleEnum("role").notNull().default("coach"),
   active: boolean("active").notNull().default(true),
+  /** secret for the personal calendar feed (/cal/<token>) and its tap-to-reply links; rotate to revoke */
+  calendarToken: text("calendar_token").unique(),
   createdAt: createdAt(),
 });
 

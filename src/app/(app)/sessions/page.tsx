@@ -1,5 +1,8 @@
 import { asc } from "drizzle-orm";
-import { Plus } from "lucide-react";
+import { CalendarDays, LayoutList, Plus } from "lucide-react";
+import { MonthCalendar } from "@/components/calendar/month-calendar";
+import { calendarEvents } from "@/lib/queries";
+import { todayISO } from "@/lib/utils";
 import Link from "next/link";
 import { TimelineBar } from "@/components/plan/timeline-bar";
 import { Badge, Button, Card, Empty, PageHeader, Select } from "@/components/ui";
@@ -9,9 +12,10 @@ import { createPlan } from "./actions";
 
 export const metadata = { title: "Session plans" };
 
-export default async function SessionsPage({ searchParams }: { searchParams: Promise<{ age?: string }> }) {
+export default async function SessionsPage({ searchParams }: { searchParams: Promise<{ age?: string; view?: string }> }) {
   await requireStaff();
-  const { age } = await searchParams;
+  const { age, view: viewParam } = await searchParams;
+  const view = viewParam === "calendar" ? "calendar" : "plans";
   const [groups, plans, weeks] = await Promise.all([
     db.select().from(schema.ageGroups).orderBy(asc(schema.ageGroups.sortOrder)),
     db.query.sessionPlans.findMany({
@@ -25,6 +29,16 @@ export default async function SessionsPage({ searchParams }: { searchParams: Pro
 
   const shownGroups = groups.filter((g) => (!age || g.code === age) && plans.some((p) => p.ageGroupId === g.id));
   const unassigned = plans.filter((p) => !p.ageGroupId);
+  const calGroups = groups.filter((g) => !age || g.code === age).map((g) => g.id);
+  const calEvents = view === "calendar" ? await calendarEvents(calGroups) : [];
+  const href = (p: { age?: string; view?: string }) => {
+    const q = new URLSearchParams();
+    const a = "age" in p ? p.age : age;
+    const v = "view" in p ? p.view : view;
+    if (a) q.set("age", a);
+    if (v === "calendar") q.set("view", "calendar");
+    return `/sessions${q.size ? `?${q}` : ""}`;
+  };
 
   return (
     <>
@@ -42,15 +56,39 @@ export default async function SessionsPage({ searchParams }: { searchParams: Pro
         }
       />
       <div className="-mx-4 mb-6 flex gap-2 overflow-x-auto scroll-px-4 px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0">
-        <Link href="/sessions" className={`rounded-full border px-3 py-1 text-sm font-medium ${!age ? "border-brand bg-brand text-brand-fg" : "border-border bg-surface text-muted"}`}>All</Link>
+        <Link href={href({ age: undefined })} className={`rounded-full border px-3 py-1 text-sm font-medium ${!age ? "border-brand bg-brand text-brand-fg" : "border-border bg-surface text-muted"}`}>All</Link>
         {groups.filter((g) => plans.some((p) => p.ageGroupId === g.id)).map((g) => (
-          <Link key={g.id} href={`/sessions?age=${g.code}`} className={`rounded-full border px-3 py-1 text-sm font-medium ${age === g.code ? "border-brand bg-brand text-brand-fg" : "border-border bg-surface text-muted"}`}>{g.code}</Link>
+          <Link key={g.id} href={href({ age: g.code })} className={`rounded-full border px-3 py-1 text-sm font-medium ${age === g.code ? "border-brand bg-brand text-brand-fg" : "border-border bg-surface text-muted"}`}>{g.code}</Link>
         ))}
+        <span className="flex-1" />
+        <div className="inline-flex rounded-full border border-border bg-surface p-0.5 text-sm" role="tablist" aria-label="View">
+          {(["plans", "calendar"] as const).map((v) => (
+            <Link
+              key={v}
+              href={href({ view: v })}
+              role="tab"
+              aria-selected={view === v}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium ${view === v ? "bg-brand text-brand-fg" : "text-muted hover:text-text"}`}
+            >
+              {v === "plans" ? <LayoutList className="size-4" /> : <CalendarDays className="size-4" />} {v === "plans" ? "Plans" : "Calendar"}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      {plans.length === 0 && <Empty title="No plans yet">Create your first session plan with the button above.</Empty>}
+      {view === "calendar" && (
+        <Card className="p-4 sm:p-5">
+          {calEvents.length ? (
+            <MonthCalendar events={calEvents} today={todayISO()} showTitles />
+          ) : (
+            <p className="text-sm text-muted">No sessions scheduled{age ? ` for ${age}` : ""} this season yet. Add weeks on the Season page.</p>
+          )}
+        </Card>
+      )}
 
-      {[...shownGroups.map((g) => ({ key: g.id, label: g.name, colour: g.colour, items: plans.filter((p) => p.ageGroupId === g.id) })), ...(unassigned.length && !age ? [{ key: "none", label: "No age group", colour: "#64748b", items: unassigned }] : [])].map((sec) => (
+      {view === "plans" && plans.length === 0 && <Empty title="No plans yet">Create your first session plan with the button above.</Empty>}
+
+      {view === "plans" && [...shownGroups.map((g) => ({ key: g.id, label: g.name, colour: g.colour, items: plans.filter((p) => p.ageGroupId === g.id) })), ...(unassigned.length && !age ? [{ key: "none", label: "No age group", colour: "#64748b", items: unassigned }] : [])].map((sec) => (
         <section key={sec.key} className="mb-10">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
             <span className="size-3 rounded-full" style={{ background: sec.colour }} /> {sec.label}

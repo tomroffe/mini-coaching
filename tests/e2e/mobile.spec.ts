@@ -39,7 +39,7 @@ test("phone: no page scrolls sideways (staff)", async ({ page }) => {
   const plan = await page.locator("a[href^='/sessions/']").first().getAttribute("href");
   await page.goto("/players?age=U6");
   const player = await page.locator("a[href^='/players/']").first().getAttribute("href");
-  const routes = ["/", "/season?age=U6", "/sessions", plan!, "/drills", "/drills/cross-the-river", "/drills/u7-tag/edit", "/players", player!, "/register", "/coaches?age=U6", "/awards", "/admin", "/admin/people"];
+  const routes = ["/", "/season?age=U6", "/season?age=U6&view=calendar", "/sessions", "/sessions?view=calendar", plan!, "/drills", "/drills/cross-the-river", "/drills/u7-tag/edit", "/players", player!, "/register", "/coaches?age=U6", "/awards", "/admin", "/admin/people"];
   for (const r of routes) await expectNoOverflow(page, r);
 });
 

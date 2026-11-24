@@ -6,6 +6,8 @@ import { TimelineBar } from "@/components/plan/timeline-bar";
 import { Card, CardHeader, Empty, LinkButton, Stat } from "@/components/ui";
 import { db, schema } from "@/db";
 import { requireAccess } from "@/lib/authz";
+import { MonthCalendar } from "@/components/calendar/month-calendar";
+import { calendarEvents } from "@/lib/queries";
 import { fmtDate, todayISO } from "@/lib/utils";
 import { MyAvailability } from "./my-availability";
 
@@ -54,6 +56,7 @@ export default async function Dashboard() {
       : Promise.resolve([{ n: 0 }]),
   ]);
   const gById = new Map(groups.map((g) => [g.id, g]));
+  const calEvents = await calendarEvents(myGroupIds, ctx.user.id);
   const daysTo = (d: string) => Math.round((new Date(d + "T12:00").getTime() - new Date(today + "T12:00").getTime()) / 864e5);
   const hour = new Date().getHours();
   const att = attStats[0];
@@ -106,6 +109,16 @@ export default async function Dashboard() {
           );
         })}
       </div>
+
+      {calEvents.length > 0 && (
+        <Card className="mb-8 p-4 sm:p-5">
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <h2 className="font-semibold">Calendar</h2>
+            <Link href="/coaches#calendar" className="text-sm text-brand hover:underline">Sync to my calendar →</Link>
+          </div>
+          <MonthCalendar events={calEvents} today={today} showMine />
+        </Card>
+      )}
 
       <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Players" value={playerCount[0]?.n ?? 0} hint="in your age groups" />

@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
-import { CalendarPlus, Settings2 } from "lucide-react";
+import { CalendarDays, CalendarPlus, List, Settings2 } from "lucide-react";
+import { MonthCalendar } from "@/components/calendar/month-calendar";
 import Link from "next/link";
 import { Button, Card, Empty, Field, Input, PageHeader, Select } from "@/components/ui";
 import { db, schema } from "@/db";
@@ -12,7 +13,7 @@ import { WeekRow } from "./week-row";
 
 export const metadata = { title: "Season" };
 
-export default async function SeasonPage({ searchParams }: { searchParams: Promise<{ age?: string; season?: string }> }) {
+export default async function SeasonPage({ searchParams }: { searchParams: Promise<{ age?: string; season?: string; view?: string }> }) {
   const ctx = await requireAccess(["admin", "coach"]);
   const sp = await searchParams;
   const [seasons, groups] = await Promise.all([
@@ -26,7 +27,7 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
   const group = groups.find((g) => g.code === sp.age) ?? myGroups[0] ?? groups[0];
   const canEdit = canManageAgeGroup(ctx, group.id);
 
-  const [weeks, plans, avail, att] = await Promise.all([
+  const [weeks, plans, avail, att, mineRows] = await Promise.all([
     db.query.seasonWeeks.findMany({
       where: (w, { and, eq }) => and(eq(w.seasonId, season.id), eq(w.ageGroupId, group.id)),
       orderBy: (w, { asc }) => asc(w.date),
@@ -44,7 +45,15 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
       .innerJoin(schema.seasonWeeks, eq(schema.seasonWeeks.id, schema.attendance.seasonWeekId))
       .where(eq(schema.seasonWeeks.ageGroupId, group.id))
       .groupBy(schema.attendance.seasonWeekId),
+    db
+      .select({ weekId: schema.coachAvailability.seasonWeekId, status: schema.coachAvailability.status })
+      .from(schema.coachAvailability)
+      .innerJoin(schema.seasonWeeks, eq(schema.seasonWeeks.id, schema.coachAvailability.seasonWeekId))
+      .where(and(eq(schema.seasonWeeks.ageGroupId, group.id), eq(schema.coachAvailability.userId, ctx.user.id))),
   ]);
+  const mineBy = new Map(mineRows.map((m) => [m.weekId, m.status]));
+  const view = sp.view === "calendar" ? "calendar" : "list";
+  const viewHref = (v: string) => `/season?age=${group.code}&season=${season.name}${v === "calendar" ? "&view=calendar" : ""}`;
   const availBy = new Map(avail.map((a) => [a.weekId, a.n]));
   const attBy = new Map(att.map((a) => [a.weekId, a.n]));
   const today = todayISO();
@@ -110,9 +119,38 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
         </Card>
       ) : (
         <>
-          <p className="mb-4 text-sm text-muted">
-            {trainingCount} training · {weeks.filter((w) => w.status === "cancelled").length} cancelled · {weeks.filter((w) => w.status === "no_session").length} no session
-          </p>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted">
+              {trainingCount} training · {weeks.filter((w) => w.status === "cancelled").length} cancelled · {weeks.filter((w) => w.status === "no_session").length} no session
+            </p>
+            <div className="inline-flex rounded-full border border-border bg-surface p-0.5 text-sm" role="tablist" aria-label="View">
+              {(["list", "calendar"] as const).map((v) => (
+                <Link
+                  key={v}
+                  href={viewHref(v)}
+                  role="tab"
+                  aria-selected={view === v}
+                  className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium", view === v ? "bg-brand text-brand-fg" : "text-muted hover:text-text")}
+                >
+                  {v === "list" ? <List className="size-4" /> : <CalendarDays className="size-4" />} {v === "list" ? "List" : "Calendar"}
+                </Link>
+              ))}
+            </div>
+          </div>
+          {view === "calendar" && (
+            <Card className="p-4 sm:p-5">
+              <MonthCalendar
+                today={today}
+                showMine
+                showTitles
+                events={weeks.map((w) => {
+                  const p = plans.find((x) => x.id === w.sessionPlanId);
+                  return { weekId: w.id, date: w.date, start: w.startTime, status: w.status, code: group.code, colour: group.colour, planId: p?.id ?? null, planTitle: p?.title ?? null, mine: mineBy.get(w.id) ?? null };
+                })}
+              />
+            </Card>
+          )}
+          {view === "list" && (
           <div className="space-y-8">
             {[...byMonth.entries()].map(([month, ws]) => (
               <section key={month}>
@@ -131,12 +169,15 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
                       attended={attBy.get(w.id)}
                       canEdit={canEdit}
                       colour={group.colour}
+                      userId={ctx.user.id}
+                      mine={mineBy.get(w.id) ?? null}
                     />
                   ))}
                 </div>
               </section>
             ))}
           </div>
+          )}
           {canEdit && (
             <details className="mt-8 rounded-2xl border border-border bg-surface p-4">
               <summary className="cursor-pointer font-semibold"><Settings2 className="mr-1 inline size-4" /> Season tools</summary>
