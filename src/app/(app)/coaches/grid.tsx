@@ -30,7 +30,6 @@ export function AvailabilityGrid({ me, isAdmin, weeks, coaches, availability, fo
                 <th key={w.id} className={cn("min-w-16 p-2 text-center font-medium", w.id === focusWeekId && "bg-brand-soft")}>
                   <div className="text-[10px] uppercase text-muted">{d.toLocaleDateString("en-GB", { month: "short" })}</div>
                   <div className="text-lg leading-none font-bold">{d.getDate()}</div>
-                  {w.status === "festival" && <div className="text-[9px] font-semibold text-amber-600">FESTIVAL</div>}
                 </th>
               );
             })}

@@ -17,7 +17,7 @@ test("unauthenticated users are sent to login", async ({ page }) => {
 test("seeded U6 season matches the PDF: 23 sessions", async ({ page }) => {
   await login(page);
   await page.goto("/season?age=U6");
-  await expect(page.getByText("23 training sessions")).toBeVisible();
+  await expect(page.getByText("23 training ·")).toBeVisible();
   await expect(page.locator("select[aria-label='Session plan']").first()).toHaveValue(/.+/);
   await expect(page.getByText("NOVEMBER 2026", { exact: false })).toBeVisible();
 });

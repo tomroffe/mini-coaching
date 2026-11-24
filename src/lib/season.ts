@@ -1,6 +1,6 @@
 /** Pure season helpers (unit-tested). */
 
-export type WeekLite = { id: string; date: string; status: "training" | "festival" | "cancelled" | "no_session"; planId: string | null };
+export type WeekLite = { id: string; date: string; status: "training" | "cancelled" | "no_session"; planId: string | null };
 
 /**
  * A session was cancelled: per the coaching plan, "move the sequence forward rather than

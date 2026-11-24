@@ -26,7 +26,7 @@ export default async function CoachesPage({ searchParams }: { searchParams: Prom
     db
       .select()
       .from(schema.seasonWeeks)
-      .where(and(eq(schema.seasonWeeks.ageGroupId, group.id), gte(schema.seasonWeeks.date, from), inArray(schema.seasonWeeks.status, ["training", "festival"])))
+      .where(and(eq(schema.seasonWeeks.ageGroupId, group.id), gte(schema.seasonWeeks.date, from), eq(schema.seasonWeeks.status, "training")))
       .orderBy(asc(schema.seasonWeeks.date))
       .limit(10),
     db

@@ -18,7 +18,7 @@ const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
 export const roleEnum = pgEnum("role", ["admin", "coach", "parent"]);
-export const weekStatusEnum = pgEnum("week_status", ["training", "festival", "cancelled", "no_session"]);
+export const weekStatusEnum = pgEnum("week_status", ["training", "cancelled", "no_session"]);
 export const blockTypeEnum = pgEnum("block_type", ["arrival", "skill", "water", "challenge", "game"]);
 export const attendanceStatusEnum = pgEnum("attendance_status", ["present", "absent", "late"]);
 export const availabilityEnum = pgEnum("availability", ["available", "maybe", "unavailable"]);

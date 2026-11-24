@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, sql } from "drizzle-orm";
-import { CalendarPlus, Wand2 } from "lucide-react";
+import { CalendarPlus, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { Button, Card, Empty, Field, Input, PageHeader, Select } from "@/components/ui";
 import { db, schema } from "@/db";
@@ -7,6 +7,7 @@ import { canManageAgeGroup, requireAccess } from "@/lib/authz";
 import { SEASON_PATHWAY } from "@/lib/curriculum";
 import { cn, todayISO } from "@/lib/utils";
 import { addWeek, autoAssignSequence, generateWeeks } from "./actions";
+import { AssignSequence } from "./assign-sequence";
 import { WeekRow } from "./week-row";
 
 export const metadata = { title: "Season" };
@@ -104,19 +105,14 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
       {weeks.length === 0 ? (
         <Card className="p-6">
           <h2 className="mb-1 text-lg font-semibold">No sessions scheduled for {group.name} yet</h2>
-          <p className="mb-4 text-sm text-muted">Generate a week for every training day between two dates. You can mark festivals and days off afterwards.</p>
+          <p className="mb-4 text-sm text-muted">Generate a week for every training day between two dates. You can mark cancellations and days off afterwards.</p>
           {canEdit ? <GenerateForm seasonId={season.id} ageGroupId={group.id} from={season.startDate} to={season.endDate} /> : <p className="text-sm">Ask an admin or the {group.code} coach to set this up.</p>}
         </Card>
       ) : (
         <>
-          <div className="mb-3 flex flex-wrap items-center gap-3 text-sm text-muted">
-            <span>{trainingCount} training sessions · {weeks.filter((w) => w.status === "festival").length} festivals · {weeks.filter((w) => w.status === "cancelled").length} cancelled</span>
-            {canEdit && plans.some((p) => p.sequence) && (
-              <form action={autoAssignSequence.bind(null, season.id, group.id)} className="ml-auto">
-                <Button variant="secondary" size="sm"><Wand2 className="size-4" /> Assign plans in sequence</Button>
-              </form>
-            )}
-          </div>
+          <p className="mb-4 text-sm text-muted">
+            {trainingCount} training · {weeks.filter((w) => w.status === "cancelled").length} cancelled · {weeks.filter((w) => w.status === "no_session").length} no session
+          </p>
           <div className="space-y-8">
             {[...byMonth.entries()].map(([month, ws]) => (
               <section key={month}>
@@ -143,17 +139,16 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
           </div>
           {canEdit && (
             <details className="mt-8 rounded-2xl border border-border bg-surface p-4">
-              <summary className="cursor-pointer font-semibold"><CalendarPlus className="mr-1 inline size-4" /> Add weeks</summary>
-              <div className="mt-4 grid gap-6 md:grid-cols-2">
+              <summary className="cursor-pointer font-semibold"><Settings2 className="mr-1 inline size-4" /> Season tools</summary>
+              <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
                 <form action={addWeek} className="space-y-3">
                   <input type="hidden" name="seasonId" value={season.id} />
                   <input type="hidden" name="ageGroupId" value={group.id} />
-                  <div className="text-sm font-medium">Single date (e.g. a festival)</div>
+                  <div className="text-sm font-semibold"><CalendarPlus className="mr-1 inline size-4" /> Add a single date</div>
                   <div className="flex gap-2">
-                    <Input type="date" name="date" required />
-                    <Select name="status" className="w-36">
+                    <Input type="date" name="date" required aria-label="Date" />
+                    <Select name="status" className="w-36" aria-label="Status">
                       <option value="training">Training</option>
-                      <option value="festival">Festival</option>
                       <option value="no_session">No session</option>
                     </Select>
                   </div>
@@ -161,9 +156,18 @@ export default async function SeasonPage({ searchParams }: { searchParams: Promi
                   <Button size="sm">Add date</Button>
                 </form>
                 <div>
-                  <div className="mb-3 text-sm font-medium">Fill a range</div>
+                  <div className="mb-3 text-sm font-semibold"><CalendarPlus className="mr-1 inline size-4" /> Fill a range</div>
                   <GenerateForm seasonId={season.id} ageGroupId={group.id} from={season.startDate} to={season.endDate} />
                 </div>
+                {plans.some((p) => p.sequence) && (
+                  <div className="space-y-2 border-t border-border pt-4 md:col-span-2">
+                    <div className="text-sm font-semibold">Assign plans in order</div>
+                    <p className="text-sm text-muted">
+                      Puts {group.code}&apos;s numbered plans onto the training weeks in order (plan 1 on the first training week, and so on). Useful after adding weeks. It replaces any plans already assigned.
+                    </p>
+                    <AssignSequence action={autoAssignSequence.bind(null, season.id, group.id)} count={plans.filter((p) => p.sequence).length} group={group.code} />
+                  </div>
+                )}
               </div>
             </details>
           )}

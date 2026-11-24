@@ -81,7 +81,6 @@ export default async function ParentPage({ searchParams }: { searchParams: Promi
                         <CalendarDays className="mt-0.5 size-5 text-brand" />
                         <div>
                           <div className="font-semibold">{fmtDate(next.date, { weekday: "long", day: "numeric", month: "long" })}, {next.startTime}–{next.endTime}</div>
-                          {next.status === "festival" && <Badge colour="#d97706">Festival</Badge>}
                           {nextPlan && <p className="mt-1 text-sm">{nextPlan.title.replace(/^Session \d+:\s*/, "")}: <span className="text-muted">{nextPlan.outcome}</span></p>}
                           {next.notes && <p className="text-sm text-muted">{next.notes}</p>}
                         </div>

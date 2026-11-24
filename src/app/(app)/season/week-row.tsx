@@ -7,12 +7,11 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { cn } from "@/lib/utils";
 import { cancelWeekAndShift, deleteWeek, updateWeek } from "./actions";
 
-type Week = { id: string; date: string; status: "training" | "festival" | "cancelled" | "no_session"; sessionPlanId: string | null; notes: string; startTime: string; endTime: string };
+type Week = { id: string; date: string; status: "training" | "cancelled" | "no_session"; sessionPlanId: string | null; notes: string; startTime: string; endTime: string };
 type PlanOpt = { id: string; title: string; sequence: number | null };
 
 const STATUS = {
   training: { label: "Training", cls: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" },
-  festival: { label: "Festival", cls: "bg-amber-500/15 text-amber-700 dark:text-amber-300" },
   cancelled: { label: "Cancelled", cls: "bg-red-500/15 text-red-700 dark:text-red-300" },
   no_session: { label: "No session", cls: "bg-slate-500/15 text-slate-600 dark:text-slate-300" },
 } as const;
@@ -36,7 +35,7 @@ export function WeekRow({ week: w, plans, isNext, isPast, available, attended, c
     <motion.div
       layout
       className={cn(
-        "relative flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border bg-surface p-3 transition sm:flex-nowrap",
+        "relative flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border bg-surface p-3 transition md:flex-nowrap",
         isNext ? "border-brand shadow-md ring-2 ring-brand/20" : "border-border",
         (w.status === "cancelled" || w.status === "no_session") && "opacity-60",
         pending && "animate-pulse",
@@ -66,7 +65,7 @@ export function WeekRow({ week: w, plans, isNext, isPast, available, attended, c
           {isNext && <span className="rounded-full bg-brand px-2 py-0.5 text-xs font-semibold text-brand-fg">Next up</span>}
           {w.notes && <span className="truncate text-xs text-muted">· {w.notes}</span>}
         </div>
-        {w.status === "training" || w.status === "festival" ? (
+        {w.status === "training" ? (
           canEdit ? (
             <select
               value={w.sessionPlanId ?? ""}
@@ -84,23 +83,23 @@ export function WeekRow({ week: w, plans, isNext, isPast, available, attended, c
         {msg && <p className="mt-1 text-xs text-amber-600">{msg}</p>}
       </div>
 
-      <div className="-mb-1 flex w-full shrink-0 items-center justify-end gap-1 border-t border-border/60 pt-1 sm:mb-0 sm:w-auto sm:border-0 sm:pt-0">
+      <div className="-mb-1 flex w-full shrink-0 items-center justify-end gap-1 border-t border-border/60 pt-1 md:mb-0 md:w-auto md:border-0 md:pt-0">
         {plan && (
-          <Link href={`/sessions/${plan.id}`} className="mr-auto flex min-h-10 items-center rounded-lg px-2.5 text-sm font-medium text-brand hover:bg-brand-soft sm:mr-0 sm:min-h-0 sm:py-1.5">
+          <Link href={`/sessions/${plan.id}`} className="mr-auto flex min-h-10 items-center rounded-lg px-2.5 text-sm font-medium text-brand hover:bg-brand-soft md:mr-0 md:min-h-0 md:py-1.5">
             Plan
           </Link>
         )}
-        <Link href={`/coaches?week=${w.id}`} className="flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-xs text-muted hover:bg-surface-2 sm:min-h-0 sm:py-1.5" title="Coaches available" aria-label={`${available} coaches available`}>
+        <Link href={`/coaches?week=${w.id}`} className="flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-xs text-muted hover:bg-surface-2 md:min-h-0 md:py-1.5" title="Coaches available" aria-label={`${available} coaches available`}>
           <UserRoundCheck className="size-4" /> {available}
         </Link>
         {w.status !== "cancelled" && w.status !== "no_session" && (
-          <Link href={`/register/${w.id}`} className="flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-xs text-muted hover:bg-surface-2 sm:min-h-0 sm:py-1.5" title="Register" aria-label="Register">
+          <Link href={`/register/${w.id}`} className="flex min-h-10 items-center gap-1 rounded-lg px-2.5 text-xs text-muted hover:bg-surface-2 md:min-h-0 md:py-1.5" title="Register" aria-label="Register">
             <ClipboardCheck className="size-4" /> {attended ?? "–"}
           </Link>
         )}
         {canEdit && (
           <div className="relative" ref={menuRef}>
-            <button onClick={() => setMenu((m) => !m)} className="flex size-10 items-center justify-center rounded-lg text-muted hover:bg-surface-2 sm:size-8" aria-label="Week actions" aria-expanded={menu}>
+            <button onClick={() => setMenu((m) => !m)} className="flex size-10 items-center justify-center rounded-lg text-muted hover:bg-surface-2 md:size-8" aria-label="Week actions" aria-expanded={menu}>
               <MoreHorizontal className="size-4" />
             </button>
             {menu && (

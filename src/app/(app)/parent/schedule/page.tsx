@@ -22,7 +22,7 @@ export default async function ParentSchedule() {
 
   return (
     <>
-      <PageHeader eyebrow="Parent view" title="Training schedule" subtitle="Sessions, festivals and any cancellations." />
+      <PageHeader eyebrow="Parent view" title="Training schedule" subtitle="Training sessions and any cancellations." />
       <div className="space-y-2">
         {weeks.map((w) => {
           const g = groups.find((x) => x.id === w.ageGroupId)!;
@@ -32,7 +32,7 @@ export default async function ParentSchedule() {
               <span className="w-24 shrink-0 text-sm font-semibold">{fmtDate(w.date)}</span>
               <Badge colour={g.colour}>{g.code}</Badge>
               <span className="text-sm text-muted">{w.startTime}–{w.endTime}</span>
-              <span className="flex-1 truncate text-sm">{w.status === "festival" ? "🏆 Festival" : w.status === "cancelled" ? "Cancelled" : w.status === "no_session" ? "No session" : plan?.title.replace(/^Session \d+:\s*/, "") ?? "Training"}</span>
+              <span className="flex-1 truncate text-sm">{w.status === "cancelled" ? "Cancelled" : w.status === "no_session" ? "No session" : plan?.title.replace(/^Session \d+:\s*/, "") ?? "Training"}</span>
               {w.notes && <span className="hidden text-xs text-muted sm:inline">{w.notes}</span>}
             </Card>
           );

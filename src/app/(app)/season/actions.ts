@@ -14,7 +14,7 @@ async function weekGuard(weekId: string) {
   return { ctx, w };
 }
 
-export async function updateWeek(weekId: string, patch: { status?: "training" | "festival" | "cancelled" | "no_session"; sessionPlanId?: string | null; notes?: string; startTime?: string; endTime?: string }) {
+export async function updateWeek(weekId: string, patch: { status?: "training" | "cancelled" | "no_session"; sessionPlanId?: string | null; notes?: string; startTime?: string; endTime?: string }) {
   await weekGuard(weekId);
   await db.update(schema.seasonWeeks).set(patch).where(eq(schema.seasonWeeks.id, weekId));
   revalidatePath("/season");

@@ -19,7 +19,7 @@ export default async function RegisterIndex() {
   const weeks = await db
     .select()
     .from(schema.seasonWeeks)
-    .where(and(inArray(schema.seasonWeeks.ageGroupId, ids), gte(schema.seasonWeeks.date, from), lte(schema.seasonWeeks.date, to), inArray(schema.seasonWeeks.status, ["training", "festival"])))
+    .where(and(inArray(schema.seasonWeeks.ageGroupId, ids), gte(schema.seasonWeeks.date, from), lte(schema.seasonWeeks.date, to), eq(schema.seasonWeeks.status, "training")))
     .orderBy(asc(schema.seasonWeeks.date));
   const gById = new Map(groups.map((g) => [g.id, g]));
 
@@ -39,7 +39,7 @@ export default async function RegisterIndex() {
                   <span className="flex size-12 items-center justify-center rounded-xl text-sm font-bold text-white" style={{ background: g.colour }}>{g.code}</span>
                   <div>
                     <div className="font-semibold">{fmtDate(w.date, { weekday: "long", day: "numeric", month: "long" })}</div>
-                    <div className="text-sm text-muted">{isToday ? "Today · " : w.date < today ? "Past · " : "Upcoming · "}{w.startTime}–{w.endTime}{w.status === "festival" && " · Festival"}</div>
+                    <div className="text-sm text-muted">{isToday ? "Today · " : w.date < today ? "Past · " : "Upcoming · "}{w.startTime}–{w.endTime}</div>
                   </div>
                 </Card>
               </Link>

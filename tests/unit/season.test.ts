@@ -4,14 +4,14 @@ import { cancelAndShift, weekdaysBetween, type WeekLite } from "@/lib/season";
 const w = (id: string, date: string, planId: string | null, status: WeekLite["status"] = "training"): WeekLite => ({ id, date, planId, status });
 
 describe("cancelAndShift", () => {
-  const weeks = [w("1", "2027-01-03", "A"), w("2", "2027-01-10", "B"), w("3", "2027-01-17", "C"), w("4", "2027-01-24", null, "festival"), w("5", "2027-01-31", "D")];
+  const weeks = [w("1", "2027-01-03", "A"), w("2", "2027-01-10", "B"), w("3", "2027-01-17", "C"), w("4", "2027-01-24", null, "no_session"), w("5", "2027-01-31", "D")];
 
   it("moves the cancelled plan and all later plans forward one training week", () => {
     const { updates, dropped } = cancelAndShift(weeks, "2");
     const byId = Object.fromEntries(updates.map((u) => [u.id, u]));
     expect(byId["2"]).toEqual({ id: "2", status: "cancelled", planId: null });
     expect(byId["3"].planId).toBe("B");
-    expect(byId["5"].planId).toBe("C"); // festival week is skipped
+    expect(byId["5"].planId).toBe("C"); // a no-session week is skipped
     expect(byId["4"]).toBeUndefined();
     expect(dropped).toEqual(["D"]);
   });

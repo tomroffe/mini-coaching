@@ -3,7 +3,7 @@ import { ArrowRight, CalendarDays, ClipboardCheck, Shapes, Target } from "lucide
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TimelineBar } from "@/components/plan/timeline-bar";
-import { Badge, Card, CardHeader, Empty, LinkButton, Stat } from "@/components/ui";
+import { Card, CardHeader, Empty, LinkButton, Stat } from "@/components/ui";
 import { db, schema } from "@/db";
 import { requireAccess } from "@/lib/authz";
 import { fmtDate, todayISO } from "@/lib/utils";
@@ -20,7 +20,7 @@ export default async function Dashboard() {
     ? await db
         .select()
         .from(schema.seasonWeeks)
-        .where(and(inArray(schema.seasonWeeks.ageGroupId, myGroupIds), gte(schema.seasonWeeks.date, today), inArray(schema.seasonWeeks.status, ["training", "festival"])))
+        .where(and(inArray(schema.seasonWeeks.ageGroupId, myGroupIds), gte(schema.seasonWeeks.date, today), eq(schema.seasonWeeks.status, "training")))
         .orderBy(asc(schema.seasonWeeks.date))
     : [];
   // first upcoming week per group
@@ -84,7 +84,7 @@ export default async function Dashboard() {
                 <span className="ml-auto rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold">{n === 0 ? "Today" : n === 1 ? "Tomorrow" : `in ${n} days`}</span>
               </div>
               <div className="space-y-4 p-5">
-                {w.status === "festival" && <Badge colour="#d97706">Festival{w.notes && ` · ${w.notes}`}</Badge>}
+                {w.notes && <p className="text-sm text-muted">{w.notes}</p>}
                 {plan ? (
                   <>
                     <div>
