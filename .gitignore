@@ -10,3 +10,4 @@ backups
 data
 .next-test
 .next-build
+/dist-db

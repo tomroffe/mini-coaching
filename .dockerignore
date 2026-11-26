@@ -9,3 +9,4 @@ data
 .next-test
 .next-build
 tests
+dist-db

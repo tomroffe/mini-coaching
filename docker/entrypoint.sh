@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 echo "Running migrations..."
-node_modules/.bin/tsx --env-file-if-exists=.env src/db/migrate.ts
+node dist-db/migrate.mjs
 if [ -n "$SEED_ADMIN_EMAIL" ]; then
   echo "Seeding (idempotent)..."
-  node_modules/.bin/tsx --env-file-if-exists=.env src/db/seed/index.ts
+  node dist-db/seed.mjs
 fi
 exec node server.js
